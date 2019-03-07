@@ -1,0 +1,18 @@
+Living Room:                                                                                                                                                                       
+  name: Living Room
+  entities:
+    - media_player.shield
+    - light.living_room_spot_lights
+    - remote.living_room
+Bedroom:
+  name: Bedroom
+  entities:
+    - switch.bedroom_lamp
+Brinleys Room:
+  name: Brinleys Room
+  entities:
+    - switch.brinley_s_lamp
+Ellies Room:
+  name: Ellies Room
+  entities:
+    - switch.ellie_s_lamp

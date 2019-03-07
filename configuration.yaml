@@ -1,0 +1,88 @@
+homeassistant:
+  # Name of the location where Home Assistant is running
+  name: Home
+  # Location required to calculate the time the sun rises and sets
+  latitude: 42.3453
+  longitude: -83.8244
+  # Impacts weather/sunrise data (altitude above sea level in meters)
+  elevation: 265
+  # metric for Metric, imperial for Imperial
+  unit_system: imperial
+  # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  time_zone: America/Detroit
+  # Customization file
+  customize: !include customize.yaml
+
+# Configure a default setup of Home Assistant (frontend, api, etc)
+default_config:
+
+# Show the introduction message on startup.
+introduction:
+
+device_tracker:
+
+# Uncomment this if you are using SSL/TLS, running in Docker container, etc.
+# http:
+#   base_url: example.duckdns.org:8123
+panel_iframe:
+  configurator:
+    title: Configurator
+    icon: mdi:wrench
+    url: http://hassio.local:3218
+
+python_script:
+
+# Sensors
+sensor:
+  # Weather prediction
+  - platform: yr
+  - platform: template
+    sensors:
+      sun_elevation:
+        value_template: "{{states.sun.sun.attributes.elevation}}"
+      pixel3_battery:
+          value_template: "{{ states.device_tracker.pixel3.attributes.battery }}"
+          friendly_name: "Pixel3 Battery Level"
+
+remote:
+  - platform: harmony
+    name: Living Room
+    host: 192.168.0.105
+    activity: Watch TV
+
+lutron_caseta:
+    host: 192.168.0.100
+    keyfile: /ssl/lutron/caseta.key
+    certfile: /ssl/lutron/caseta.crt
+    ca_certs: /ssl/lutron/caseta-bridge.crt
+
+switch:
+  - platform: tplink
+    host: 192.168.0.101
+  - platform: tplink
+    host: 192.168.0.103
+  - platform: tplink
+    host: 192.168.0.102
+
+media_player:
+  - platform: spotify
+    client_id: 8015cfb9d68b4fa89850c17ab22c3f24
+    client_secret: c3ea3d29c2bd4e0b9cda8581a7718ada
+#    aliases:
+#        abc123def456: 'Kitchen'
+
+# googlehome:
+#   devices:
+#     - host: 192.168.0.107
+#     - host: 192.168.0.108
+#     - host: 192.168.0.109
+
+# Text to speech
+tts:
+  - platform: google
+
+group: !include groups.yaml
+automation: !include automations.yaml
+binary_sensor: !include binary_sensor.yaml
+input_boolean: !include input_boolean.yaml
+script: !include scripts.yaml

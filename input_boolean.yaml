@@ -1,0 +1,14 @@
+guest_mode:
+  name: Guest Mode
+  initial: off
+  icon: mdi:account-plus
+  
+living_room_spot_lights_auto_on:
+  name: Living Room Lights Automatically Turned On
+  initial: off
+  icon: mdi:lightbulb-on
+
+living_room_spot_lights_auto_dim:
+  name: Living Room Spotlights Automatically Dimmed
+  initial: off
+  icon: mdi:car-lights-dimmed

@@ -1,0 +1,88 @@
+- id: sunset_transition
+  alias: 'sunset transition'
+  trigger:
+  - platform: time_pattern
+    minutes: '/2'
+  condition:
+    condition: and 
+    conditions:
+      - condition: time
+        after: '16:00:00'
+        before: '21:00:00'
+      - condition: numeric_state
+        entity_id: sensor.sun_elevation
+        above: 0
+        below: 9
+      - condition: state
+        entity_id: input_boolean.guest_mode
+        state: 'off'
+      - condition: or
+        conditions:
+          - condition: state
+            entity_id: light.living_room_spot_lights
+            state: 'off'
+          - condition: template
+            value_template: '{{ states.light.living_room_spot_lights.attributes.brightness < (((0.0625*(states.sun.sun.attributes.elevation**2))-(31.125*states.sun.sun.attributes.elevation)+246.5)|int) }} '
+  action:
+    - service: light.turn_on
+      entity_id: light.living_room_spot_lights
+      data_template:
+        profile: sunset 
+        brightness: '{{((0.0625*(states.sun.sun.attributes.elevation**2))-(31.125*states.sun.sun.attributes.elevation)+246.5)|int}}'
+    - service: input_boolean.turn_on
+      entity_id: input_boolean.living_room_spot_lights_auto_on
+
+- id: living_room_spot_lights_off
+  alias: "Living Room Spot Lights Turned Off"
+  initial_state: "on"
+  trigger:
+    - platform: state
+      entity_id: switch.living_room_spot_lights
+      to: 'off'
+  condition:
+    - condition: state
+      entity_id: input_boolean.living_room_spot_lights_auto_on
+      state: 'on'
+  action:
+    - service: input_boolean.turn_off
+      entity_id: input_boolean.living_room_spot_lights_auto_on
+
+- id: night_transition
+  alias: 'night transition'
+  trigger:
+  - platform: time
+    at: '20:55:00'
+  condition:
+    condition: and 
+    conditions:
+    - condition: state
+      entity_id: input_boolean.guest_mode
+      state: 'off'
+    - condition: state
+      entity_id: light.living_room_spot_lights
+      state: 'on'
+  action: 
+    - service: input_boolean.turn_on
+      entity_id: input_boolean.living_room_spot_lights_auto_dim
+    - service: python_script.light_fader
+      data:
+        entity_id: light.living_room_spot_lights
+        end_level_pct: '10'
+        transition: '00:10:00'
+        
+- id: living_room_spot_lights_on
+  alias: "Living Room Spot Lights Turned On"
+  initial_state: "off"
+  trigger:
+    - platform: state
+      entity_id: switch.living_room_spot_lights
+      to: 'on'
+  condition:
+    - condition: state
+      entity_id: input_boolean.living_room_spot_lights_auto_dim
+      state: 'on'
+  action:
+    - service: input_boolean.turn_off
+      entity_id: input_boolean.living_room_spot_lights_auto_dim
+      
+      

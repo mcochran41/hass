@@ -11,4 +11,4 @@ living_room_spot_lights_auto_on:
 living_room_spot_lights_auto_dim:
   name: Living Room Spotlights Automatically Dimmed
   initial: off
-  icon: mdi:car-lights-dimmed
+  icon: mdi:car-light-dimmed

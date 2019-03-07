@@ -24,7 +24,7 @@
         platform: 'state'
         to_state: 'off'
       - platform: 'numeric_state'
-        entity_id: 'sensor.pixel3_battery'                                                                                                                                         
+        entity_id: 'sensor.pixel_3_battery'                                                                                                                                         
         prob_given_true: 0.8
         prob_given_false: .2
         above: 95

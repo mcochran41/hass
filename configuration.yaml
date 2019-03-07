@@ -40,9 +40,9 @@ sensor:
     sensors:
       sun_elevation:
         value_template: "{{states.sun.sun.attributes.elevation}}"
-      pixel3_battery:
-          value_template: "{{ states.device_tracker.pixel3.attributes.battery }}"
-          friendly_name: "Pixel3 Battery Level"
+      pixel_3_battery:
+          value_template: "{{ states.device_tracker.pixel_3.attributes.battery }}"
+          friendly_name: "Pixel 3 Battery Level"
 
 remote:
   - platform: harmony

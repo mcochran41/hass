@@ -5,7 +5,7 @@
   observations:
       - entity_id: 'group.tracked_users'
         prob_given_true: 0.99
-        prob_given_false: 0.5 
+        prob_given_false: 0.45 
         platform: 'state'
         to_state: 'home'
       - entity_id: 'sensor.sun'
@@ -14,13 +14,13 @@
         platform: 'state'
         to_state: 'below_horizon'
       - entity_id: 'group.all_lights'
-        prob_given_true: 0.8 
-        prob_given_false: 0.3 
+        prob_given_true: 0.99 
+        prob_given_false: 0.5 
         platform: 'state'
         to_state: 'off'
       - entity_id: 'remote.living_room'
-        prob_given_true: 0.9 
-        prob_given_false: 0.2 
+        prob_given_true: 0.99 
+        prob_given_false: 0.7
         platform: 'state'
         to_state: 'off'
       - platform: 'numeric_state'

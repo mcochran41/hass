@@ -16,3 +16,12 @@ Ellies Room:
   name: Ellies Room
   entities:
     - switch.ellie_s_lamp
+Foyer:
+  name: Foyer
+  entities:
+    - light.front_foyer_chandelier
+    
+Kids Bathroom:
+  name: Kids Bathroom
+  entities:
+    - light.kids_bathroom_vanity_lights

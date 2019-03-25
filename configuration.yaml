@@ -22,8 +22,8 @@ introduction:
 device_tracker:
   - platform: nmap_tracker
     hosts: 
-      - 192.168.0.120
       - 192.168.0.114
+      - 192.168.0.30
 
 # Uncomment this if you are using SSL/TLS, running in Docker container, etc.
 # http:
@@ -61,11 +61,11 @@ lutron_caseta:
     ca_certs: /ssl/lutron/caseta-bridge.crt
 
 tplink:
-  discovery: false
+  discovery: true
   switch:
-    - host: 192.168.0.101
-    - host: 192.168.0.103
-    - host: 192.168.0.102
+    - host: 192.168.0.60
+    - host: 192.168.0.61
+    - host: 192.168.0.62
 
 media_player:
   - platform: spotify

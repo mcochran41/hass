@@ -7,8 +7,18 @@ living_room_spot_lights_auto_on:
   name: Living Room Lights Automatically Turned On
   initial: off
   icon: mdi:lightbulb-on
+  
+living_room_spot_lights_manual_off:
+  name: Living Room Lights Manually Turned Off
+  initial: off
+  icon: mdi:lightbulb-off
 
 living_room_spot_lights_auto_dim:
   name: Living Room Spotlights Automatically Dimmed
+  initial: off
+  icon: mdi:car-light-dimmed
+  
+kids_bathroom_vanity_lights_auto_dim:
+  name: Kids Bathroom Lights Automatically Dimmed
   initial: off
   icon: mdi:car-light-dimmed

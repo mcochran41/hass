@@ -1,5 +1,26 @@
+- id: sunset_transition_prep
+  alias: 'Sunset Transition Prep'
+  trigger:
+  - platform: time_pattern
+    minutes: '/2'
+  condition:
+    condition: and 
+    conditions:
+      - condition: time
+        after: '16:00:00'
+        before: '21:00:00'
+      - condition: numeric_state
+        entity_id: sensor.sun_elevation
+        above: 15
+        below: 20
+  action:
+    - service: input_boolean.turn_off
+      entity_id: input_boolean.living_room_spot_lights_manual_off
+    - service: input_boolean.turn_off
+      entity_id: input_boolean.living_room_spot_lights_auto_on
+
 - id: sunset_transition
-  alias: 'sunset transition'
+  alias: 'Sunset Transition'
   trigger:
   - platform: time_pattern
     minutes: '/2'
@@ -15,6 +36,9 @@
         below: 9
       - condition: state
         entity_id: input_boolean.guest_mode
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.living_room_spot_lights_manual_off
         state: 'off'
       - condition: or
         conditions:
@@ -46,9 +70,11 @@
   action:
     - service: input_boolean.turn_off
       entity_id: input_boolean.living_room_spot_lights_auto_on
+    - service: input_boolean.turn_on
+      entity_id: input_boolean.living_room_spot_lights_manual_off
 
 - id: night_transition
-  alias: 'night transition'
+  alias: 'Night Transition'
   trigger:
   - platform: time
     at: '20:55:00'
@@ -68,6 +94,29 @@
       data:
         entity_id: light.living_room_spot_lights
         end_level_pct: '10'
+        transition: '00:10:00'
+        
+- id: Dim_bathroom_after_bedtime
+  alias: 'Dim Bathroom after Bedtime'
+  trigger:
+  - platform: time
+    at: '21:00:00'
+  condition:
+    condition: and 
+    conditions:
+    - condition: state
+      entity_id: input_boolean.guest_mode
+      state: 'off'
+    - condition: state
+      entity_id: light.kids_bathroom_vanity_lights
+      state: 'on'
+  action: 
+    - service: input_boolean.turn_on
+      entity_id: input_boolean.kids_bathroom_vanity_lights_auto_dim
+    - service: python_script.light_fader
+      data:
+        entity_id: light.kids_bathroom_vanity_lights
+        end_level_pct: '1'
         transition: '00:10:00'
         
 - id: living_room_spot_lights_on

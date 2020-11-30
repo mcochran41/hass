@@ -4,6 +4,14 @@ Living Room:
     - media_player.shield
     - light.living_room_spot_lights
     - remote.living_room
+    - media_player.living_room
+    - switch.living_room_christmas_tree
+Toy Room:
+  name: Toy Room
+  entities:
+    - switch.toy_room_lamp
+    - media_player.toy_room
+    - switch.christmas_tree
 Bedroom:
   name: Bedroom
   entities:

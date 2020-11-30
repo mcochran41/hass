@@ -22,3 +22,18 @@ kids_bathroom_vanity_lights_auto_dim:
   name: Kids Bathroom Lights Automatically Dimmed
   initial: off
   icon: mdi:car-light-dimmed
+  
+outside_christmas_lights_manually_off:
+  name: Outside Christmas Lights Manually Disabled
+  initial: off
+  icon: mdi:lightbulb-group-off
+  
+outside_lights_manual_off:
+  name: Outside Lights Manually Turned Off
+  initial: off
+  icon: mdi:lightbulb-off
+ 
+outside_lights_auto_on:
+  name: Outside Lights Automatically Turned On
+  initial: off
+  icon: mdi:lightbulb-on

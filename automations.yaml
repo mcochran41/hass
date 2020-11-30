@@ -1,85 +1,89 @@
 - id: sunset_transition_prep
-  alias: 'Sunset Transition Prep'
+  alias: Sunset Transition Prep
   trigger:
-  - platform: time_pattern
-    minutes: '/2'
+  - minutes: /2
+    platform: time_pattern
   condition:
-    condition: and 
+  - condition: and
     conditions:
-      - condition: time
-        after: '16:00:00'
-        before: '21:00:00'
-      - condition: numeric_state
-        entity_id: sensor.sun_elevation
-        above: 15
-        below: 20
-  action:
-    - service: input_boolean.turn_off
-      entity_id: input_boolean.living_room_spot_lights_manual_off
-    - service: input_boolean.turn_off
-      entity_id: input_boolean.living_room_spot_lights_auto_on
-
-- id: sunset_transition
-  alias: 'Sunset Transition'
-  trigger:
-  - platform: time_pattern
-    minutes: '/2'
-  condition:
-    condition: and 
-    conditions:
-      - condition: time
-        after: '16:00:00'
-        before: '21:00:00'
-      - condition: numeric_state
-        entity_id: sensor.sun_elevation
-        above: 0
-        below: 9
-      - condition: state
-        entity_id: input_boolean.guest_mode
-        state: 'off'
-      - condition: state
-        entity_id: input_boolean.living_room_spot_lights_manual_off
-        state: 'off'
-      - condition: or
-        conditions:
-          - condition: state
-            entity_id: light.living_room_spot_lights
-            state: 'off'
-          - condition: template
-            value_template: '{{ states.light.living_room_spot_lights.attributes.brightness < (((0.0625*(states.sun.sun.attributes.elevation**2))-(31.125*states.sun.sun.attributes.elevation)+246.5)|int) }} '
-  action:
-    - service: light.turn_on
-      entity_id: light.living_room_spot_lights
-      data_template:
-        profile: sunset 
-        brightness: '{{((0.0625*(states.sun.sun.attributes.elevation**2))-(31.125*states.sun.sun.attributes.elevation)+246.5)|int}}'
-    - service: input_boolean.turn_on
-      entity_id: input_boolean.living_room_spot_lights_auto_on
-
-- id: living_room_spot_lights_off
-  alias: "Living Room Spot Lights Turned Off"
-  initial_state: "on"
-  trigger:
-    - platform: state
-      entity_id: switch.living_room_spot_lights
-      to: 'off'
-  condition:
+    - after: '13:00:00'
+      before: '22:00:00'
+      condition: time
     - condition: state
-      entity_id: input_boolean.living_room_spot_lights_auto_on
-      state: 'on'
+      entity_id: sensor.sun_is_rising
+      state: 'False'
+    - above: '12'
+      below: '20'
+      condition: numeric_state
+      entity_id: sensor.sun_elevation
   action:
-    - service: input_boolean.turn_off
-      entity_id: input_boolean.living_room_spot_lights_auto_on
-    - service: input_boolean.turn_on
+  - entity_id: input_boolean.living_room_spot_lights_manual_off
+    service: input_boolean.turn_off
+  - entity_id: input_boolean.living_room_spot_lights_auto_on
+    service: input_boolean.turn_off
+  - data: {}
+    entity_id: input_boolean.outside_lights_manual_off
+    service: input_boolean.turn_off
+- id: sunset_transition
+  alias: Sunset Transition
+  trigger:
+  - platform: time_pattern
+    minutes: /1
+  condition:
+    condition: and
+    conditions:
+    - condition: time
+      after: '13:00:00'
+      before: '22:00:00'
+    - condition: state
+      entity_id: sensor.sun_is_rising
+      state: 'False'
+    - condition: numeric_state
+      entity_id: sensor.sun_elevation
+      above: 0
+      below: 9
+    - condition: state
+      entity_id: input_boolean.guest_mode
+      state: 'off'
+    - condition: state
       entity_id: input_boolean.living_room_spot_lights_manual_off
-
+      state: 'off'
+    - condition: or
+      conditions:
+      - condition: state
+        entity_id: light.living_room_spot_lights
+        state: 'off'
+      - condition: template
+        value_template: '{{ states.light.living_room_spot_lights.attributes.brightness
+          < (((0.0625*(states.sun.sun.attributes.elevation**2))-(31.125*states.sun.sun.attributes.elevation)+246.5)|int)
+          }} '
+  action:
+  - service: light.turn_on
+    entity_id: light.living_room_spot_lights
+    data_template:
+      profile: sunset
+      brightness: '{{((0.0625*(states.sun.sun.attributes.elevation**2))-(31.125*states.sun.sun.attributes.elevation)+246.5)|int}}'
+  - service: input_boolean.turn_on
+    entity_id: input_boolean.living_room_spot_lights_auto_on
+- id: living_room_spot_lights_off
+  alias: Living Room Spot Lights Turned Off
+  initial_state: 'on'
+  trigger:
+  - platform: state
+    entity_id: switch.living_room_spot_lights
+    to: 'off'
+  action:
+  - service: input_boolean.turn_off
+    entity_id: input_boolean.living_room_spot_lights_auto_on
+  - service: input_boolean.turn_on
+    entity_id: input_boolean.living_room_spot_lights_manual_off
 - id: night_transition
-  alias: 'Night Transition'
+  alias: Night Transition
   trigger:
   - platform: time
     at: '20:55:00'
   condition:
-    condition: and 
+    condition: and
     conditions:
     - condition: state
       entity_id: input_boolean.guest_mode
@@ -87,22 +91,21 @@
     - condition: state
       entity_id: light.living_room_spot_lights
       state: 'on'
-  action: 
-    - service: input_boolean.turn_on
-      entity_id: input_boolean.living_room_spot_lights_auto_dim
-    - service: python_script.light_fader
-      data:
-        entity_id: light.living_room_spot_lights
-        end_level_pct: '10'
-        transition: '00:10:00'
-        
+  action:
+  - service: input_boolean.turn_on
+    entity_id: input_boolean.living_room_spot_lights_auto_dim
+  - service: python_script.light_fader
+    data:
+      entity_id: light.living_room_spot_lights
+      end_level_pct: '1'
+      transition: 00:10:00
 - id: Dim_bathroom_after_bedtime
-  alias: 'Dim Bathroom after Bedtime'
+  alias: Dim Bathroom after Bedtime
   trigger:
   - platform: time
     at: '21:00:00'
   condition:
-    condition: and 
+    condition: and
     conditions:
     - condition: state
       entity_id: input_boolean.guest_mode
@@ -110,28 +113,223 @@
     - condition: state
       entity_id: light.kids_bathroom_vanity_lights
       state: 'on'
-  action: 
-    - service: input_boolean.turn_on
-      entity_id: input_boolean.kids_bathroom_vanity_lights_auto_dim
-    - service: python_script.light_fader
-      data:
-        entity_id: light.kids_bathroom_vanity_lights
-        end_level_pct: '1'
-        transition: '00:10:00'
-        
-- id: living_room_spot_lights_on
-  alias: "Living Room Spot Lights Turned On"
-  initial_state: "off"
-  trigger:
-    - platform: state
-      entity_id: switch.living_room_spot_lights
-      to: 'on'
-  condition:
-    - condition: state
-      entity_id: input_boolean.living_room_spot_lights_auto_dim
-      state: 'on'
   action:
-    - service: input_boolean.turn_off
-      entity_id: input_boolean.living_room_spot_lights_auto_dim
-      
-      
+  - service: input_boolean.turn_on
+    entity_id: input_boolean.kids_bathroom_vanity_lights_auto_dim
+  - service: python_script.light_fader
+    data:
+      entity_id: light.kids_bathroom_vanity_lights
+      end_level_pct: '1'
+      transition: 00:10:00
+- id: living_room_spot_lights_on
+  alias: Living Room Spot Lights Turned On
+  initial_state: 'off'
+  trigger:
+  - platform: state
+    entity_id: switch.living_room_spot_lights
+    to: 'on'
+  condition:
+  - condition: state
+    entity_id: input_boolean.living_room_spot_lights_auto_dim
+    state: 'on'
+  action:
+  - service: input_boolean.turn_off
+    entity_id: input_boolean.living_room_spot_lights_auto_dim
+- id: sunset_transition_outside_lights
+  alias: Sunset Transition Outside Lights
+  trigger:
+  - platform: time_pattern
+    minutes: /5
+  condition:
+    condition: and
+    conditions:
+    - condition: time
+      after: '13:00:00'
+      before: '22:00:00'
+    - condition: state
+      entity_id: sensor.sun_is_rising
+      state: 'False'
+    - condition: numeric_state
+      entity_id: sensor.sun_elevation
+      above: 0
+      below: 9
+    - condition: state
+      entity_id: input_boolean.guest_mode
+      state: 'off'
+    - condition: state
+      entity_id: input_boolean.outside_christmas_lights_manually_off
+      state: 'off'
+  action:
+  - service: switch.turn_on
+    entity_id: switch.outside_tree_lights
+  - service: switch.turn_on
+    entity_id: switch.outside_present_lights
+- id: late_night_disable
+  alias: Late Night Disable
+  trigger:
+  - at: '23:58:00'
+    platform: time
+  action:
+  - entity_id: switch.outside_tree_lights
+    service: switch.turn_off
+  - entity_id: switch.outside_present_lights
+    service: switch.turn_off
+- id: show_front_door
+  alias: Show Front Door
+  trigger:
+    platform: state
+    entity_id: remote.living_room
+  condition:
+    condition: template
+    value_template: '{{ trigger.to_state.attributes.current_activity == "Show Front
+      Door" }}'
+  action:
+  - data:
+      command: Show Front Door on Shield
+    service: rest_command.assistant_relay
+- id: master_bedroom_pico_bedroom_lamp_off
+  alias: Master Bedroom Pico Bedroom Lamp Off
+  trigger:
+  - entity_id: sensor.master_bedroom_pico_2
+    platform: state
+    to: '4'
+  action:
+  - entity_id: switch.bedroom_lamp
+    service: switch.turn_off
+  initial_state: true
+- id: master_bedroom_pico_bedroom_lamp_on
+  alias: Hallway Pico Bedroom Lamp On
+  initial_state: true
+  trigger:
+  - platform: state
+    entity_id: sensor.master_bedroom_pico_2
+    to: '1'
+  action:
+  - service: switch.turn_on
+    entity_id: switch.bedroom_lamp
+- id: toy_room_pico_lamp_off
+  alias: Toy Room Pico Lamp Off
+  trigger:
+  - entity_id: sensor.toy_room_pico
+    platform: state
+    to: '4'
+  action:
+  - entity_id: switch.toy_room_lamp
+    service: switch.turn_off
+  initial_state: true
+- id: toy_room_pico_lamp_on
+  alias: Toy Room Pico Lamp On
+  initial_state: true
+  trigger:
+  - platform: state
+    entity_id: sensor.toy_room_pico
+    to: '1'
+  action:
+  - service: switch.turn_on
+    entity_id: switch.toy_room_lamp
+- id: ellies_lamp_pico_lamp_off
+  alias: Ellies Room Pico Lamp Off
+  trigger:
+  - entity_id: sensor.master_bedroom_pico
+    platform: state
+    to: '4'
+  action:
+  - entity_id: switch.ellie_s_lamp
+    service: switch.turn_off
+  initial_state: true
+- id: ellies_room_pico_lamp_on
+  alias: Ellies Room Pico Lamp On
+  initial_state: true
+  trigger:
+  - platform: state
+    entity_id: sensor.master_bedroom_pico
+    to: '1'
+  action:
+  - service: switch.turn_on
+    entity_id: switch.ellie_s_lamp
+#- id: turn_outside_lights_on
+#  alias: Turn Outside Lights On
+#  trigger:
+#  - minutes: /1
+#    platform: time_pattern
+#  condition:
+#  - condition: and
+#    conditions:
+#    - condition: state
+#      entity_id: sensor.sun_is_rising
+#      state: 'False'
+#    - above: '-2'
+#      below: '2'
+#      condition: numeric_state
+#      entity_id: sensor.sun_elevation
+#    - condition: state
+#      entity_id: input_boolean.outside_lights_manual_off
+#      state: 'off'
+#    - condition: or
+#      conditions:
+#      - condition: state
+#        entity_id: light.exterior_garage_lights
+#        state: 'off'
+#      - condition: state
+#        entity_id: light.exterior_porch_lights
+#        state: 'off'
+#  action:
+#  - entity_id: light.exterior_garage_lights
+#    service: light.turn_on
+#  - entity_id: light.exterior_porch_lights
+#    service: light.turn_on
+#  - entity_id: input_boolean.outside_lights_auto_on
+#    service: input_boolean.turn_on
+#- id: turn_off_outside_lights
+#  alias: Turn Off Outside Lights
+#  trigger:
+#  - at: '23:10:00'
+#    platform: time
+#  action:
+#  - entity_id: input_boolean.outside_lights_auto_on
+#    service: input_boolean.turn_off
+#  - entity_id: input_boolean.outside_lights_manual_off
+#    service: input_boolean.turn_off
+#  - entity_id: light.exterior_garage_lights
+#    service: light.turn_off
+#  - entity_id: light.exterior_porch_lights
+#    service: light.turn_off
+#- id: outside_porch_lights_off
+#  alias: Outside Porch Lights Turned Off
+#  initial_state: 'on'
+#  trigger:
+#  - platform: state
+#    entity_id: light.exterior_porch_lights
+#    to: 'off'
+#  action:
+#  - service: input_boolean.turn_off
+#    entity_id: input_boolean.outside_lights_auto_on
+#  - service: input_boolean.turn_on
+#    entity_id: input_boolean.outside_lights_manual_off
+- id: motion_on_sensor_pantry
+  alias: Pantry Motion On
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.pantry_motion_sensor_motion
+    from: 'off'
+    to: 'on'
+#      - platform: numeric_state
+#        entity_id: sensor.pantry_motion_sensor_light_level
+#        below: 9500                            
+  action:
+  - service: light.turn_on
+    entity_id: light.pantry_lights
+- id: motion_off_sensor_pantry
+  alias: Pantry Motion Off
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.pantry_motion_sensor_motion
+    from: 'on'
+    to: 'off'
+    for: '00:04:00'
+#      - platform: numeric_state
+#        entity_id: sensor.pantry_motion_sensor_light_level
+#        below: 9500                            
+  action:
+  - service: light.turn_off
+    entity_id: light.pantry_lights

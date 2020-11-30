@@ -16,13 +16,10 @@ homeassistant:
 # Configure a default setup of Home Assistant (frontend, api, etc)
 default_config:
 
-# Show the introduction message on startup.
-introduction:
-
 device_tracker:
   - platform: nmap_tracker
     hosts: 
-      - 192.168.0.114
+      - 192.168.0.31
       - 192.168.0.30
 
 # Uncomment this if you are using SSL/TLS, running in Docker container, etc.
@@ -44,6 +41,8 @@ sensor:
     sensors:
       sun_elevation:
         value_template: "{{states.sun.sun.attributes.elevation}}"
+      sun_is_rising: 
+        value_template: "{{states.sun.sun.attributes.rising}}"
       pixel_3_battery:
           value_template: "{{ states.device_tracker.pixel_3.attributes.battery }}"
           friendly_name: "Pixel 3 Battery Level"
@@ -51,21 +50,35 @@ sensor:
 remote:
   - platform: harmony
     name: Living Room
-    host: 192.168.0.105
+    host: 192.168.0.90
+    activity: Watch TV
+  - platform: harmony
+    name: Basement
+    host: 192.168.0.91
     activity: Watch TV
 
-lutron_caseta:
-    host: 192.168.0.100
-    keyfile: /ssl/lutron/caseta.key
-    certfile: /ssl/lutron/caseta.crt
-    ca_certs: /ssl/lutron/caseta-bridge.crt
+#lutron_caseta:
+#    host: 192.168.0.100
+#    keyfile: /ssl/lutron/caseta.key
+#    certfile: /ssl/lutron/caseta.crt
+#    ca_certs: /ssl/lutron/caseta-bridge.crt
+    
+lutron_caseta_pro:
+    bridges:
+      - host: 192.168.0.100
+        mac: F4:5E:AB:33:68:93
 
 tplink:
-  discovery: true
+  discovery: false
   switch:
     - host: 192.168.0.60
     - host: 192.168.0.61
     - host: 192.168.0.62
+    - host: 192.168.0.63
+#    - host: 192.168.0.64
+#    - host: 192.168.0.66
+#  strip:
+#    - host: 192.168.0.65
 
 media_player:
   - platform: spotify
@@ -73,6 +86,15 @@ media_player:
     client_secret: c3ea3d29c2bd4e0b9cda8581a7718ada
 #    aliases:
 #        abc123def456: 'Kitchen'
+
+dyson:
+  username: mcochran@gmail.com
+  password: fGsltw41!
+  language: US
+  devices:
+    - device_id: C2Z-US-MBC8629A
+      device_ip: 192.168.0.241
+
 
 # googlehome:
 #   devices:
@@ -82,7 +104,27 @@ media_player:
 
 # Text to speech
 tts:
-  - platform: google
+  - platform: google_translate
+    service_name: google_say
+    
+rest_command:
+  assistant_broadcast:
+    url: http://192.168.0.118:3000/assistant
+    method: POST
+    content_type: 'application/json'
+    payload: '{"command":"{{ command }}", "user":"mcochran", "broadcast":true}'
+    
+  assistant_converse:
+    url: http://192.168.0.118:3000/assistant
+    method: POST
+    content_type: 'application/json'
+    payload: '{"command":"{{ command }}", "user":"mcochran", "converse":true}'
+
+  assistant_relay:
+    url: http://192.168.0.118:3000/assistant
+    method: POST
+    content_type: 'application/json'
+    payload: '{"command":"{{ command }}", "user":"mcochran"}'
 
 group: !include groups.yaml
 automation: !include automations.yaml
